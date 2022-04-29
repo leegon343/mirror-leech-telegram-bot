@@ -2,7 +2,6 @@ from logging import getLogger, ERROR
 from os import remove as osremove, walk, path as ospath, rename as osrename
 from time import time, sleep
 from pyrogram.errors import FloodWait, RPCError
-from pyrogram import enums
 from PIL import Image
 from threading import RLock
 
@@ -39,12 +38,10 @@ class TgUploader:
         path = f"{DOWNLOAD_DIR}{self.__listener.uid}"
         size = get_readable_file_size(get_path_size(path))
         for dirpath, subdir, files in sorted(walk(path)):
-            if '/.unwanted' in dirpath:
-                continue
             for file_ in sorted(files):
                 if self.__is_cancelled:
                     return
-                if file_.endswith(tuple(EXTENTION_FILTER)):
+                if file_.lower().endswith(tuple(EXTENTION_FILTER)):
                     continue
                 up_path = ospath.join(dirpath, file_)
                 fsize = ospath.getsize(up_path)
@@ -98,7 +95,6 @@ class TgUploader:
                     self.__sent_msg = self.__sent_msg.reply_video(video=up_path,
                                                               quote=True,
                                                               caption=cap_mono,
-                                                              parse_mode=enums.ParseMode.HTML,
                                                               duration=duration,
                                                               width=width,
                                                               height=height,
@@ -111,7 +107,6 @@ class TgUploader:
                     self.__sent_msg = self.__sent_msg.reply_audio(audio=up_path,
                                                               quote=True,
                                                               caption=cap_mono,
-                                                              parse_mode=enums.ParseMode.HTML,
                                                               duration=duration,
                                                               performer=artist,
                                                               title=title,
@@ -122,7 +117,6 @@ class TgUploader:
                     self.__sent_msg = self.__sent_msg.reply_photo(photo=up_path,
                                                               quote=True,
                                                               caption=cap_mono,
-                                                              parse_mode=enums.ParseMode.HTML,
                                                               disable_notification=True,
                                                               progress=self.__upload_progress)
                 else:
@@ -138,7 +132,6 @@ class TgUploader:
                                                              quote=True,
                                                              thumb=thumb,
                                                              caption=cap_mono,
-                                                             parse_mode=enums.ParseMode.HTML,
                                                              disable_notification=True,
                                                              progress=self.__upload_progress)
         except FloodWait as f:
